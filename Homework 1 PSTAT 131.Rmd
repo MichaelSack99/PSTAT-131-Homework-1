@@ -1,29 +1,203 @@
 ---
 title: "Homework 1 PSTAT 131"
-output: html_document
+author: "Michael Sack"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE)
 ```
 
-## R Markdown
+## Machine Learning Main Ideas
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Please answer the following questions. Be sure that your solutions are clearly marked and that your document is neatly formatted.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+You don’t have to rephrase everything in your own words, but if you quote directly, you should cite whatever materials you use (this can be as simple as “from the lecture/page # of book”).
 
-```{r cars}
-summary(cars)
-print("HI")
+### Question 1:
+
+Define supervised and unsupervised learning. What are the difference(s) between them?
+
+Supervised learning is when you split a data set into two portions; one to use for making a prediction, and the other to compare to your predicted data points as a means of determining the accuracy of your prediction.
+
+Unsupervised learning, as one would expect, is when you make a prediction without selecting those observations from the data for comparison. 
+
+In supervised learning, we can: 
+- Better understand how the predictors affect the results
+- "Find the 'best model' for response given predictors"
+- "Asses the quality of our predictions and (or) estimation"
+  - (Found on slide 30 of lecture 1)
+
+### Question 2:
+
+Explain the difference between a regression model and a classification model, specifically in the context of machine learning.
+
+In a regression model, the output is quantitative, while in a classification model, the output is qualitative.
+More specifically, the output of a regression model would be numerical values, such as height, width, weight, etc., while the output of a classification model would be categorical values, such as color, shape, etc.
+
+### Question 3:
+
+Name two commonly used metrics for regression ML problems. Name two commonly used metrics for classification ML problems.
+
+- As described in the email from the professor, this has not yet been mentioned in lecture.
+
+### Question 4:
+
+As discussed, statistical models can be used for different purposes. These purposes can generally be classified into the following three categories. Provide a brief description of each.
+
+From slide 7 of lecture 2:
+
+Descriptive models:
+- "Choose model to best visually emphasize a trend in data"
+- "i.e., using a line on a scatterplot"
+
+
+Inferential models:
+- "What features are significant?"
+- "Aim is to test theories"
+- "(Possibly) causal claims"
+- "State relationship between outcome & predictor(s)"
+
+
+Predictive models:
+- "What combo of features fits best?"
+- "Aim is to predict Y with minimum reducible error"
+- "Not focused on hypothesis tests"
+
+
+### Question 5:
+
+Predictive models are frequently used in machine learning, and they can usually be described as either mechanistic or empirically-driven. Answer the following questions.
+
+Define mechanistic. Define empirically-driven.
+- According to Oxford Language, mechanistic means "relating to theories which explain phenomena in purely physical or deterministic terms". Conversely, we find that empirically-driven data is based on past observations rather than theory or logic. 
+
+In general, is a mechanistic or empirically-driven model easier to understand? Explain your choice.
+- Empircally-driven models are easier to understand as they do not require you to have an understanding of the theoretically elements that affect your model. 
+
+Describe how the bias-variance tradeoff is related to the use of mechanistic or empirically-driven models.
+- As described in the email from the professor, this has not yet been mentioned in lecture.
+
+### Question 6:
+
+A political candidate’s campaign has collected some detailed voter history data from their constituents. The campaign is interested in two questions:
+
+1) Given a voter’s profile/data, how likely is it that they will vote in favor of the candidate?
+
+2) How would a voter’s likelihood of support for the candidate change if they had personal contact with the candidate?
+
+Classify each question as either predictive or inferential. Explain your reasoning for each.
+
+Question 1 is predictive because we are looking at a persons history to help make a prediction on how they will act in the future. 
+Question 2 is inferential because instead of using past data to form a prediction, we are inferring the result of a hypothetical situation that has not happened yet and thus has no real data behind it. 
+
+
+## Exploratory Data Analysis
+
+This section will ask you to complete several exercises. For this homework assignment, we’ll be working with the mpg data set that is loaded when you load the tidyverse. Make sure you load the tidyverse and any other packages you need.
+
+```{r}
+#install.packages("tidyverse")
+#install.packages("ISLR")
+
+library(tidyverse)
+library(ISLR)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+Exploratory data analysis (or EDA) is not based on a specific set of rules or formulas. It is more of a state of curiosity about data. It’s an iterative process of:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+- generating questions about data
+- visualize and transform your data as necessary to get answers
+- use what you learned to generate more questions
+
+A couple questions are always useful when you start out. These are “what variation occurs within the variables,” and “what covariation occurs between the variables.”
+
+You should use the tidyverse and ggplot2 for these exercises.
+
+### Exercise 1:
+
+We are interested in highway miles per gallon, or the hwy variable. Create a histogram of this variable.
+
+```{r}
+hwy_mpg <- mpg$hwy
+hist(hwy_mpg,  main= "Histogram", xlab="Highway Miles per Gallon")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Describe what you see/learn.
+- The histogram shows that the cars surveyed in the data set seem to most frequently depict around 25-30 highway miles per gallon or 15-20 highway miles per gallon. 
+
+
+### Exercise 2:
+
+Create a scatterplot. Put hwy on the x-axis and cty on the y-axis. 
+
+```{r}
+plot(mpg$hwy, mpg$cty, main="Scatterplot", xlab="Highway Miles per Gallon", ylab="City Miles per Gallon", pch=19)
+```
+
+Describe what you notice. Is there a relationship between hwy and cty? What does this mean?
+- There appears to be a positive linear relationship between hwy and cty. This means that both of these variables are correlated, specifically in that when one variable increases, the other variable will increase respectively
+
+### Exercise 3:
+
+Make a bar plot of manufacturer. Flip it so that the manufacturers are on the y-axis. Order the bars by height. 
+
+```{r}
+ggplot(mpg, aes(y=reorder(mpg$manufacturer, mpg$manufacturer, function(x) - length(x)))) + geom_bar(fill='blue') + labs(y='Manufacturer Name') + ggtitle("Bar Plot")
+```
+Which manufacturer produced the most cars? 
+- Dodge produced the most cars
+
+Which produced the least?
+- Lincoln produced the least cars
+
+
+### Exercise 4:
+
+Make a box plot of hwy, grouped by cyl.
+
+```{r}
+ggplot(mpg, aes(y=mpg$hwy, x = as.factor(cyl))) + geom_boxplot(fill='blue') + labs(x = "Number of Cylinder", y='Highway Miles per Gallon') + ggtitle("Box Plot")
+```
+
+Do you see a pattern? If so, what?
+- It appears that as the number of cylinders increases, the highway miles per gallon tends to decrease.
+
+### Exercise 5:
+
+Use the corrplot package to make a lower triangle correlation matrix of the mpg dataset. (Hint: You can find information on the package here.)
+
+```{r}
+#install.packages("corrplot")
+library(corrplot)
+mpg_df = as.data.frame(mpg[,sapply(mpg,is.numeric)])
+Corr_mpg <- cor(mpg_df)
+corrplot(Corr_mpg, method = 'number', type = c("lower"))
+```
+
+Which variables are positively or negatively correlated with which others? Do these relationships make sense to you? Are there any that surprise you?
+
+Positively correlated variables:
+- displ and year
+- displ and cyl
+- displ and hwy
+- year and cyl
+- cty and hwy
+
+These relationship all make sense to me!
+
+Negatively correlated variables:
+- displ and cty
+- displ and hwy
+- year and cty
+- cyl and cty
+- cyl and hwy
+
+These relationship also all make sense to me!
+
