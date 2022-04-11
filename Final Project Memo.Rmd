@@ -1,0 +1,84 @@
+---
+title: "Final Data Memo"
+author: "Michael Sack"
+output:
+    html_document:
+      toc: true
+      toc_float: true
+      code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+For this project, I will be using Spotifyr (https://www.rdocumentation.org/packages/spotifyr/versions/2.2.3) and the Spotify API to source data regarding a user's music preference. This data set will focus on the users most currently listened to songs, as this is the best indicator of their current music taste. I will be selecting users who have over 4000 liked tracks, as well as listened to over 500 unique songs in the past year. For each song, I will look at 13 predictors: tempo (bpm), genre, length, region, age (of artist), date (of release), speechiness (How wordy the song is vocally), key (the main selection of notes used to create the song), danceability (a Spotify metric to define the dancibility of a song), Gender of the singer, number of monthly listeners, total streams worldwide, and total streams by the user. 8 of these variables are numeric, while the other 5 are categorical. There is no missing data!
+
+The goal of this project is to create a model that can (hopefully) accurately determine the current music preferences of a user, and thus help suggest new music for the user to listen to that closely aligns with the attributes of the music they are currently listening to. In other words, the model will try to determine the users current preferences of each predictor, such as their preferred danceability or bpm, and see if this data can help predict their future preferences. To test the success of this model, 20% of the most recent data will be used as a test set to compare to our models prediction. When preforming an analysis on these variables, I will note which variables hold more significance within the users preference and which do not. For example, if 90% of the users music is over 130 bpm, it is very likely that they really enjoy fast paste music, and thus this predictor will have much more weight in my prediction. In addition, because some of these variables may hold a high significance while others hold a negligible significance, the response variables (which will help predict the users preferences) will vary per user. The goal of my model is predictive, as I am using past data to help forecast the music taste for a user in the future. 
+
+Proposed project timeline:
+
+April 10 - April 23:
+
+- Complete introduction
+
+- Load data and packages
+
+- Data cleaning
+
+April 24 - May 7:
+
+- Exploratory Data
+
+May 8- May 21:
+
+- Model Building
+
+May 22 - June 4:
+
+- Conclusion
+
+At the moment, I do not see any significant problems that I will encounter when working on the project. However, I am sure I will run in to several hurdles when trying to implement the necessary code when trying to manipulate my data, as this process can often be very tedious and specific. 
+
+Begging work on accessing Spotify's API and fiddling with potential data: 
+```{r}
+# install.packages('spotifyr')
+library(spotifyr)
+```
+
+```{r}
+id <- 'cd463dc3a8e74468b6f841d51e52ed53'
+secret <- 'f6ee1a1bda3643309b1754f5f65be02f'
+Sys.setenv(SPOTIFY_CLIENT_ID = id)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+
+access_token <- get_spotify_access_token()
+```
+```{r}
+beatles <- get_artist_audio_features('the beatles')
+```
+```{r}
+library(dplyr)
+library(purrr)
+library(knitr)
+
+beatles %>% 
+    count(key_mode, sort = TRUE) %>% 
+    head(5) %>% 
+    kable()
+```
+
+```{r}
+#library(lubridate)
+#> Warning: package 'lubridate' was built under R version 4.1.1
+
+#get_my_recently_played(limit = 5) %>% 
+#    mutate(
+#        artist.name = map_chr(track.artists, function(x) x$name[1]),
+#        played_at = as_datetime(played_at)
+#        ) %>% 
+#    select(
+#      all_of(c("track.name", "artist.name", "track.album.name", "played_at"))
+#      ) %>% 
+#    kable()
+```
